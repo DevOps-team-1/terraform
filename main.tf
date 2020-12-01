@@ -33,7 +33,7 @@ resource "google_compute_target_pool" "my_target_pool" {
 
 resource "google_compute_instance_group_manager" "my_group" {
   name = "my-igm"
-  zone = var.zone
+  zone = "us-central1-a"
 
   version {
     instance_template  = google_compute_instance_template.my_lamp_instance.id
@@ -60,7 +60,7 @@ resource "google_compute_firewall" "my_firewall" {
 
 module "gce-lb-fr" {
   source       = "github.com/GoogleCloudPlatform/terraform-google-lb"
-  region       = var.region
+  region       = "us-central1"
   name         = "group1-lb"
   service_port = "80"
   target_tags  = ["allow-lb-service"]
@@ -69,7 +69,7 @@ module "gce-lb-fr" {
 
 resource "google_compute_autoscaler" "autoscal" {
   name   = "my-autoscaler"
-  zone   = var.zone
+  zone   = "us-central1-a"
   target = google_compute_instance_group_manager.my_group.id
 
   autoscaling_policy {
