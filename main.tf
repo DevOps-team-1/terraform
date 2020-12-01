@@ -1,8 +1,8 @@
 provider "google" {
-  credentials = var.credentials
-  project     = var.project
-  region      = var.region
-  zone        = var.zone
+  credentials = file("prefab-mountain-292413-296112-ac76d2510eff.json")
+  project     = "prefab-mountain-292413-296112"
+  region      = "us-central1"
+  zone        = "us-central1-a"
   user_project_override = true
 }
 
