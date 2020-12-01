@@ -1,6 +1,6 @@
 provider "google" {
-  credentials = file("prefab-mountain-292413-296112-ac76d2510eff.json")
-  project     = "prefab-mountain-292413-296112"
+  credentials = file("My First Project-c99026eee385.json")
+  project     = "sodium-stage-292312"
   region      = "us-central1"
   zone        = "us-central1-a"
   user_project_override = true
