@@ -1,6 +1,6 @@
 provider "google" {
   credentials = file("My First Project-ba782124c9c2.json")
-  project     = "sodium-stage-292312"
+  project     = "project-2-297319"
   region      = "us-central1"
   zone        = "us-central1-a"
   user_project_override = true
