@@ -14,7 +14,7 @@ resource "google_compute_instance" "UbuntuConfig" {
 
 
   provisioner "local-exec" {
-    command = " echo [LAMP] > hosts ;echo  ansible_host=${ google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip }  >> hosts ; echo [LAMP:vars] >> hosts ; echo ansible_user=ansible >> hosts"
+    command = " echo [LAMP] > hosts ;echo ubuntu20.04 ansible_host=${ google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip }  >> hosts ; echo [LAMP:vars] >> hosts ; echo ansible_user=ansible >> hosts"
   }
 
 
