@@ -1,48 +1,46 @@
 provider "google" {
-  credentials = file("project-2-297319-918b48a4ad3f.json")
-  project     = "project-2-297319"
-  region      = "us-central1"
-  zone        = "us-central1-a"
+  credentials = file(var.credentials)
+  project     = var.project
+  region      = var.region
+  zone        = var.zone
   user_project_override = true
+
+
 }
 
-resource "google_compute_instance_template" "my_lamp_instance" {
-  name           = "my-instance-template"
-  machine_type   = "e2-medium"
-  can_ip_forward = false
-  tags = ["foo", "bar"]
+resource "google_compute_instance" "UbuntuConfig" {
+  name = "ubuntuconfig"
+  machine_type = "e2-medium"
 
-  disk {
-    source_image = "ubuntu-2004-focal-v20201014"
+
+  provisioner "local-exec" {
+    command = " echo [LAMP] > hosts ;echo  ansible_host=${ google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip }  >> hosts ; echo [LAMP:vars] >> hosts ; echo ansible_user=ansible >> hosts"
   }
 
-  network_interface {
-    network = google_compute_network.vpc_network.name
-    access_config {
+
+
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-2004-focal-v20201014"
     }
   }
 
-  service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+  connection {
+    host = self.network_interface.0.access_config.0.nat_ip
+    type = "ssh"
+    user = var.user
+    private_key = "id_rsa"
+    agent = "false"
+    }
+
+   network_interface {
+    network = "default"
+    access_config {
+    }
   }
 }
 
-resource "google_compute_target_pool" "my_target_pool" {
-  name = "my-target-pool-2"
-}
-
-resource "google_compute_instance_group_manager" "my_group" {
-  name = "my-igm"
-  zone = "us-central1-a"
-
-  version {
-    instance_template  = google_compute_instance_template.my_lamp_instance.id
-    name               = "primary"
-  }
-
-  target_pools       = [google_compute_target_pool.my_target_pool.id]
-  base_instance_name = "lamp"
-}
 
 resource "google_compute_network" "vpc_network" {
   name                    = "terraform-vpc-145"
@@ -50,35 +48,17 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_firewall" "my_firewall" {
-  name    = "terraformfirewall"
+  name = "terraformfirewall"
   network = google_compute_network.vpc_network.name
   allow {
     protocol = "tcp"
-    ports    = [80, 22]
+    ports = [80,22]
   }
 }
 
-module "gce-lb-fr" {
-  source       = "github.com/GoogleCloudPlatform/terraform-google-lb"
-  region       = "us-central1"
-  name         = "group1-lb"
-  service_port = "80"
-  target_tags  = ["allow-lb-service"]
-}
 
+//resource "local_file" "ip_address" {
+//    content  = google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip
+//    filename = "ip_address.txt"
+//}
 
-resource "google_compute_autoscaler" "autoscal" {
-  name   = "my-autoscaler"
-  zone   = "us-central1-a"
-  target = google_compute_instance_group_manager.my_group.id
-
-  autoscaling_policy {
-    max_replicas    = 4
-    min_replicas    = 2
-    cooldown_period = 60
-
-    cpu_utilization {
-      target = 0.5
-    }
-  }
-}
