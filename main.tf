@@ -35,7 +35,7 @@ resource "google_compute_instance" "UbuntuConfig" {
     }
 
    network_interface {
-    network = "default"
+    network = google_compute_network.vpc_network.name
     access_config {
     }
   }
