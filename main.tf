@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = file(var.credentials)
+  credentials = var.credentials
   project     = var.project
   region      = var.region
   zone        = var.zone
@@ -14,7 +14,7 @@ resource "google_compute_instance" "UbuntuConfig" {
 
 
   provisioner "local-exec" {
-    command = " echo [LAMP] > hosts ;echo ubuntu20.04 ansible_host=${ google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip }  >> hosts ; echo [LAMP:vars] >> hosts ; echo ansible_user=ansible >> hosts ; echo ansible_ssh_private_key_file=/home/jenkins/.ssh/id_rsa "
+    command = " echo [LAMP] > hosts ;echo ubuntu20.04 ansible_host=${ google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip }  >> hosts ; echo [LAMP:vars] >> hosts ; echo ansible_user=ansible >> hosts"
   }
 
 
@@ -55,10 +55,4 @@ resource "google_compute_firewall" "my_firewall" {
     ports = [80,22]
   }
 }
-
-
-//resource "local_file" "ip_address" {
-//    content  = google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip
-//    filename = "ip_address.txt"
-//}
 
