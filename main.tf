@@ -4,21 +4,15 @@ provider "google" {
   region      = var.region
   zone        = var.zone
   user_project_override = true
-
-
 }
 
 resource "google_compute_instance" "UbuntuConfig" {
   name = "ubuntuconfig"
   machine_type = "e2-medium"
 
-
   provisioner "local-exec" {
     command = " echo [LAMP] > hosts ;echo ubuntu20.04 ansible_host=${ google_compute_instance.UbuntuConfig.network_interface.0.access_config.0.nat_ip }  >> hosts ; echo [LAMP:vars] >> hosts ; echo ansible_user=ansible >> hosts"
   }
-
-
-
 
   boot_disk {
     initialize_params {
@@ -35,12 +29,11 @@ resource "google_compute_instance" "UbuntuConfig" {
     }
 
    network_interface {
-    network = "default"
+    network = "google_compute_network.vpc_network.name"
     access_config {
     }
   }
 }
-
 
 resource "google_compute_network" "vpc_network" {
   name                    = "terraform-vpc-145"
